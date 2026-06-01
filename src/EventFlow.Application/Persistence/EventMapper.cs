@@ -15,11 +15,16 @@ public static class EventMapper
             VenueName = eventEntity.Venue.Name,
             VenueAddress = eventEntity.Venue.Address,
             Category = eventEntity.Category,
+
             Registrations = eventEntity.Registrations
                 .Select(r => new RegistrationData
                 {
+                    Id = r.Id,
+                    RegisteredAt = r.RegisteredAt,
+
                     Participant = new ParticipantData
                     {
+                        Id = r.Participant.Id,
                         FullName = r.Participant.FullName,
                         Email = r.Participant.Email
                     }
@@ -42,13 +47,19 @@ public static class EventMapper
             venue,
             data.Category);
 
-        foreach (var registration in data.Registrations)
+        foreach (var registrationData in data.Registrations)
         {
             var participant = new Participant(
-                registration.Participant.FullName,
-                registration.Participant.Email);
+                registrationData.Participant.Id,
+                registrationData.Participant.FullName,
+                registrationData.Participant.Email);
 
-            eventEntity.RegisterParticipant(participant);
+            var registration = new Registration(
+                registrationData.Id,
+                participant,
+                registrationData.RegisteredAt);
+
+            eventEntity.RestoreRegistration(registration);
         }
 
         return eventEntity;

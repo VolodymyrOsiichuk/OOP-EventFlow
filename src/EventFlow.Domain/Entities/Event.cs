@@ -51,6 +51,22 @@ public class Event
         Category = category;
     }
 
+    public Event(
+        Guid id,
+        string title,
+        DateTime date,
+        int capacity,
+        Venue venue,
+        EventCategory category)
+    {
+        Id = id;
+        Title = title;
+        Date = date;
+        Capacity = capacity;
+        Venue = venue;
+        Category = category;
+    }
+
     public Result RegisterParticipant(Participant participant)
     {
         if (participant is null)
@@ -61,19 +77,11 @@ public class Event
             return Result.Failure("Registration is closed. Event has already started.");
         }
 
-        if (Date < DateTime.UtcNow)
-        {
-            return Result.Failure(
-                "Registration can no longer be cancelled.");
-        }
-
         if (IsFull)
         {
             return Result.Failure("Event is full.");
         }
 
-        if (_registrations.Count >= Capacity)
-            return Result.Failure("Event is full.");
 
         bool alreadyRegistered = _registrations
             .Any(r => r.Participant.Email == participant.Email);
@@ -103,5 +111,13 @@ public class Event
         _registrations.Remove(registration);
 
         return Result.Success();
+    }
+
+    public void RestoreRegistration(Registration registration)
+    {
+        if (registration is null)
+            throw new ArgumentNullException(nameof(registration));
+
+        _registrations.Add(registration);
     }
 }
