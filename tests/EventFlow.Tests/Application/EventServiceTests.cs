@@ -35,4 +35,5 @@ public class EventServiceTests
 
         Assert.Single(events);
     }
+    
 }

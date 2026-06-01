@@ -18,4 +18,14 @@ public class Participant
         FullName = fullName;
         Email = email;
     }
+
+    public Participant(
+        Guid id,
+        string fullName,
+        string email)
+    {
+        Id = id;
+        FullName = fullName;
+        Email = email;
+    }
 }
