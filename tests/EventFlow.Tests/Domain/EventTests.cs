@@ -126,4 +126,70 @@ public class EventTests
         Assert.True(result.IsSuccess);
         Assert.Single(eventEntity.Registrations);
     }
+
+    [Fact]
+    public void CancelRegistration_WhenParticipantExists_ShouldSucceed()
+    {
+        var venue = new Venue("Hall", "Address");
+
+        var eventEntity = new Event(
+            "Conference",
+            DateTime.UtcNow.AddDays(5),
+            10,
+            venue,
+            EventCategory.Conference);
+
+        var participant =
+            new Participant(
+                "John",
+                "john@test.com");
+
+        eventEntity.RegisterParticipant(participant);
+
+        var result =
+            eventEntity.CancelRegistration(
+                "john@test.com");
+
+        Assert.True(result.IsSuccess);
+        Assert.Empty(eventEntity.Registrations);
+    }
+
+    [Fact]
+    public void CancelRegistration_WhenParticipantNotFound_ShouldFail()
+    {
+        var venue = new Venue("Hall", "Address");
+
+        var eventEntity = new Event(
+            "Conference",
+            DateTime.UtcNow.AddDays(5),
+            10,
+            venue,
+            EventCategory.Conference);
+
+        var result =
+            eventEntity.CancelRegistration(
+                "unknown@test.com");
+
+        Assert.False(result.IsSuccess);
+    }
+
+    [Fact]
+    public void Event_ShouldBecomeFull()
+    {
+        var venue = new Venue("Hall", "Address");
+
+        var eventEntity = new Event(
+            "Conference",
+            DateTime.UtcNow.AddDays(5),
+            1,
+            venue,
+            EventCategory.Conference);
+
+        eventEntity.RegisterParticipant(
+            new Participant(
+                "John",
+                "john@test.com"));
+
+        Assert.True(eventEntity.IsFull);
+    }
 }
