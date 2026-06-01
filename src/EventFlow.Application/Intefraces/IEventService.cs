@@ -11,4 +11,6 @@ public interface IEventService
     Result RegisterParticipant(RegisterParticipantRequest request);
 
     IEnumerable<Event> GetAllEvents();
+
+    Result CancelRegistration(Guid eventId, string email);
 }

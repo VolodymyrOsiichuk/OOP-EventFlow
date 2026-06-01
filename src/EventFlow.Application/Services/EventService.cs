@@ -65,4 +65,17 @@ public class EventService : IEventService
     {
         return _eventRepository.GetAll();
     }
+
+    public Result CancelRegistration(Guid eventId, string email)
+    {
+        var eventEntity =
+            _eventRepository.GetById(eventId);
+
+        if (eventEntity is null)
+        {
+            return Result.Failure("Event not found.");
+        }
+
+        return eventEntity.CancelRegistration(email);
+    }
 }

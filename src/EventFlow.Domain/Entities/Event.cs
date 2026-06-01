@@ -25,6 +25,8 @@ public class Event
     public int AvailableSpots
         => Capacity - _registrations.Count;
 
+    public bool IsFull => _registrations.Count >= Capacity;
+
     public Event(
         string title,
         DateTime date,
@@ -54,6 +56,22 @@ public class Event
         if (participant is null)
             return Result.Failure("Participant is null.");
 
+        if (Date < DateTime.UtcNow)
+        {
+            return Result.Failure("Registration is closed. Event has already started.");
+        }
+
+        if (Date < DateTime.UtcNow)
+        {
+            return Result.Failure(
+                "Registration can no longer be cancelled.");
+        }
+
+        if (IsFull)
+        {
+            return Result.Failure("Event is full.");
+        }
+
         if (_registrations.Count >= Capacity)
             return Result.Failure("Event is full.");
 
@@ -64,6 +82,25 @@ public class Event
             return Result.Failure("Participant already registered.");
 
         _registrations.Add(new Registration(participant));
+
+        return Result.Success();
+    }
+
+    public Result CancelRegistration(string email)
+    {
+        var registration = _registrations
+            .FirstOrDefault(r =>
+                r.Participant.Email.Equals(
+                    email,
+                    StringComparison.OrdinalIgnoreCase));
+
+        if (registration is null)
+        {
+            return Result.Failure(
+                "Participant is not registered.");
+        }
+
+        _registrations.Remove(registration);
 
         return Result.Success();
     }
