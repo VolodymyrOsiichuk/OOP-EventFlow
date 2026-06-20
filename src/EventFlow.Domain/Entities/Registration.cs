@@ -14,4 +14,14 @@ public class Registration
         Id = Guid.NewGuid();
         RegisteredAt = DateTime.UtcNow;
     }
+
+    public Registration(
+        Guid id,
+        Participant participant,
+        DateTime registeredAt)
+    {
+        Id = id;
+        Participant = participant;
+        RegisteredAt = registeredAt;
+    }
 }

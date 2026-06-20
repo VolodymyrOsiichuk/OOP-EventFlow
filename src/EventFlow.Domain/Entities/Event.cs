@@ -25,6 +25,8 @@ public class Event
     public int AvailableSpots
         => Capacity - _registrations.Count;
 
+    public bool IsFull => _registrations.Count >= Capacity;
+
     public Event(
         string title,
         DateTime date,
@@ -49,13 +51,37 @@ public class Event
         Category = category;
     }
 
+    public Event(
+        Guid id,
+        string title,
+        DateTime date,
+        int capacity,
+        Venue venue,
+        EventCategory category)
+    {
+        Id = id;
+        Title = title;
+        Date = date;
+        Capacity = capacity;
+        Venue = venue;
+        Category = category;
+    }
+
     public Result RegisterParticipant(Participant participant)
     {
         if (participant is null)
             return Result.Failure("Participant is null.");
 
-        if (_registrations.Count >= Capacity)
+        if (Date < DateTime.UtcNow)
+        {
+            return Result.Failure("Registration is closed. Event has already started.");
+        }
+
+        if (IsFull)
+        {
             return Result.Failure("Event is full.");
+        }
+
 
         bool alreadyRegistered = _registrations
             .Any(r => r.Participant.Email == participant.Email);
@@ -66,5 +92,32 @@ public class Event
         _registrations.Add(new Registration(participant));
 
         return Result.Success();
+    }
+
+    public Result CancelRegistration(string email)
+    {
+        var registration = _registrations
+            .FirstOrDefault(r =>
+                r.Participant.Email.Equals(
+                    email,
+                    StringComparison.OrdinalIgnoreCase));
+
+        if (registration is null)
+        {
+            return Result.Failure(
+                "Participant is not registered.");
+        }
+
+        _registrations.Remove(registration);
+
+        return Result.Success();
+    }
+
+    public void RestoreRegistration(Registration registration)
+    {
+        if (registration is null)
+            throw new ArgumentNullException(nameof(registration));
+
+        _registrations.Add(registration);
     }
 }
